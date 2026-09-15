@@ -1,7 +1,8 @@
 from datetime import date
 from typing import Literal
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from app.schemas.product import ProductInput
+from app.schemas.language import LanguagePreference
 
 class SourceCitation(BaseModel):
     document_id: str
@@ -31,17 +32,23 @@ class ComplianceCheckResponse(BaseModel):
     recommended_labs: list[str]
     unverified_claims: list[str] = []
     roadmap_available: bool = True
+    response_lang: str = "en"
+    translation_unavailable: bool = False
 
 class QueryInput(BaseModel):
     query: str
+    lang: LanguagePreference = Field(default_factory=LanguagePreference)
 
 class QueryResponse(BaseModel):
     intent: str
     message: str
     data: dict | None = None
+    response_lang: str = "en"
+    translation_unavailable: bool = False
 
 class RoadmapRequest(BaseModel):
     qco_result: QCOResult
+    lang: LanguagePreference = Field(default_factory=LanguagePreference)
 
 class RoadmapStep(BaseModel):
     step_number: int
@@ -51,3 +58,5 @@ class RoadmapStep(BaseModel):
 class RoadmapResponse(BaseModel):
     qco_id: str
     steps: list[RoadmapStep]
+    response_lang: str = "en"
+    translation_unavailable: bool = False
