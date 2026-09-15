@@ -1,7 +1,9 @@
 from fastapi.testclient import TestClient
 from app.main import app
+from app.core.config import settings
 
 client = TestClient(app)
+AUTH_HEADERS = {"X-API-Key": settings.API_KEY}
 
 def test_health_endpoint():
     response = client.get("/health")
@@ -10,7 +12,7 @@ def test_health_endpoint():
 
 def test_query_endpoint():
     payload = {"query": "Does QCO apply to imported plastic toys?"}
-    response = client.post("/query", json=payload)
+    response = client.post("/query", json=payload, headers=AUTH_HEADERS)
     assert response.status_code == 200
     data = response.json()
     assert data["intent"] in ["compliance_check", "hybrid"]
@@ -24,7 +26,7 @@ def test_compliance_check_integration():
         "manufacturer_scale": "msme",
         "is_imported": False
     }
-    response = client.post("/compliance/check", json=payload)
+    response = client.post("/compliance/check", json=payload, headers=AUTH_HEADERS)
     assert response.status_code == 200
     data = response.json()
 
@@ -42,12 +44,12 @@ def test_compliance_roadmap_integration():
         "manufacturer_scale": "large",
         "is_imported": False
     }
-    check_resp = client.post("/compliance/check", json=check_payload)
+    check_resp = client.post("/compliance/check", json=check_payload, headers=AUTH_HEADERS)
     assert check_resp.status_code == 200
     qco_result = check_resp.json()["qco_result"]
 
     roadmap_payload = {"qco_result": qco_result}
-    roadmap_resp = client.post("/compliance/roadmap", json=roadmap_payload)
+    roadmap_resp = client.post("/compliance/roadmap", json=roadmap_payload, headers=AUTH_HEADERS)
     assert roadmap_resp.status_code == 200
     roadmap_data = roadmap_resp.json()
 

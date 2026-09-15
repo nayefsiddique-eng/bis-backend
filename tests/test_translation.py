@@ -1,12 +1,14 @@
 from unittest.mock import patch, AsyncMock
 from fastapi.testclient import TestClient
 from app.main import app
+from app.core.config import settings
 from app.services.translation import BhashiniUnavailableError
 
 client = TestClient(app)
+AUTH_HEADERS = {"X-API-Key": settings.API_KEY}
 
 def test_supported_languages_endpoint():
-    response = client.get("/languages/supported")
+    response = client.get("/languages/supported", headers=AUTH_HEADERS)
     assert response.status_code == 200
     data = response.json()
     assert "languages" in data
@@ -23,7 +25,7 @@ def test_translate_text_success(mock_translate):
         "source_lang": "en",
         "target_lang": "hi"
     }
-    response = client.post("/translate/text", json=payload)
+    response = client.post("/translate/text", json=payload, headers=AUTH_HEADERS)
     assert response.status_code == 200
     data = response.json()
     assert data["translated_text"] == "खिलौने गुणवत्ता नियंत्रण आदेश"
@@ -38,7 +40,7 @@ def test_translate_text_fallback_on_bhashini_failure(mock_translate):
         "source_lang": "en",
         "target_lang": "hi"
     }
-    response = client.post("/translate/text", json=payload)
+    response = client.post("/translate/text", json=payload, headers=AUTH_HEADERS)
     assert response.status_code == 200
     data = response.json()
     assert data["translated_text"] == "Toys Quality Control Order"
@@ -46,7 +48,6 @@ def test_translate_text_fallback_on_bhashini_failure(mock_translate):
 
 @patch("app.routers.compliance.translate_text", new_callable=AsyncMock)
 def test_compliance_check_multilingual_structured_preservation(mock_translate):
-    # Mock NMT translation
     async def side_effect_translate(text, source_lang, target_lang):
         if source_lang == "hi" and target_lang == "en":
             if "जूते" in text or "footwear" in text.lower():
@@ -65,19 +66,17 @@ def test_compliance_check_multilingual_structured_preservation(mock_translate):
         "is_imported": False,
         "lang": {"lang_code": "hi"}
     }
-    response = client.post("/compliance/check", json=payload)
+    response = client.post("/compliance/check", json=payload, headers=AUTH_HEADERS)
     assert response.status_code == 200
     data = response.json()
 
     assert data["response_lang"] == "hi"
     assert data["translation_unavailable"] is False
 
-    # Human-readable fields SHOULD be translated
     assert "[HI]" in data["qco_result"]["reasoning"]
     for req in data["requirements"]:
         assert "[HI]" in req["requirement"]
 
-    # Machine / Structured fields MUST NOT BE TRANSLATED!
     assert data["qco_result"]["qco_id"] == "QCO-FOOTWEAR-2024"
     assert data["qco_result"]["standard_id"] == "IS 17043:2018"
     assert data["qco_result"]["effective_date"] == "2024-08-01"
@@ -86,7 +85,6 @@ def test_compliance_check_multilingual_structured_preservation(mock_translate):
 
 @patch("app.routers.compliance.translate_text", new_callable=AsyncMock)
 def test_compliance_check_fallback_behavior(mock_translate):
-    # Simulate network error or invalid API key
     mock_translate.side_effect = BhashiniUnavailableError("Connection refused")
 
     payload = {
@@ -96,7 +94,7 @@ def test_compliance_check_fallback_behavior(mock_translate):
         "is_imported": False,
         "lang": {"lang_code": "hi"}
     }
-    response = client.post("/compliance/check", json=payload)
+    response = client.post("/compliance/check", json=payload, headers=AUTH_HEADERS)
     assert response.status_code == 200
     data = response.json()
 
@@ -110,24 +108,18 @@ def test_voice_websocket_stream_roundtrip(mock_transcribe, mock_tts):
     mock_transcribe.return_value = "क्या खिलौनों पर QCO लागू होता है?"
     mock_tts.return_value = b"FAKE_AUDIO_BYTES"
 
-    with client.websocket_connect("/voice/stream") as websocket:
-        # Send config
+    with client.websocket_connect("/voice/stream?X-API-Key=demo-key-123", headers=AUTH_HEADERS) as websocket:
         websocket.send_json({"type": "config", "lang_code": "hi"})
         ack = websocket.receive_json()
         assert ack["type"] == "config_ack"
 
-        # Send binary audio chunk
         websocket.send_bytes(b"DUMMY_AUDIO_STREAM_DATA")
-
-        # Process audio end
         websocket.send_json({"type": "audio_end"})
 
-        # Receive transcript stream message
         msg_transcript = websocket.receive_json()
         assert msg_transcript["type"] == "transcript"
         assert msg_transcript["text"] == "क्या खिलौनों पर QCO लागू होता है?"
 
-        # Receive final query response + audio
         msg_response = websocket.receive_json()
         assert msg_response["type"] == "response"
         assert "query_response" in msg_response

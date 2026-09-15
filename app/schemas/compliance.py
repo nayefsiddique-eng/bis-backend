@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Literal
+from typing import Literal, Any
 from pydantic import BaseModel, Field
 from app.schemas.product import ProductInput
 from app.schemas.language import LanguagePreference
@@ -24,14 +24,18 @@ class QCOResult(BaseModel):
     effective_date: date
     exemption_status: Literal["none", "msme", "import", "grandfathered"]
     source: SourceCitation
+    confidence: float = Field(default=1.0, ge=0.0, le=1.0)
 
 class ComplianceCheckResponse(BaseModel):
     product: ProductInput
     qco_result: QCOResult
+    qco_results: list[QCOResult] = []
     requirements: list[ComplianceRequirement]
     recommended_labs: list[str]
     unverified_claims: list[str] = []
     roadmap_available: bool = True
+    low_confidence_warning: bool = False
+    explanation: dict[str, Any] | None = None
     response_lang: str = "en"
     translation_unavailable: bool = False
 

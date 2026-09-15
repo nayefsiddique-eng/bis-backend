@@ -14,13 +14,13 @@ def test_toys_qco_applicability_and_exemption():
         manufacturer_scale="msme",
         is_imported=False
     )
-    result = check_qco_applicability(product, today_date=TODAY)
+    result, _, _ = check_qco_applicability(product, today_date=TODAY)
 
     assert result.applies is True
     assert result.qco_id == "QCO-TOYS-2020"
     assert result.standard_id == "IS 9873 (Part 1):2019"
     assert result.effective_date == date(2021, 1, 1)
-    assert result.exemption_status == "none"  # Toys QCO has no MSME exemption
+    assert result.exemption_status == "none"
     assert "mandatory" in result.reasoning.lower()
 
     reqs, labs = resolve_requirements(result)
@@ -35,7 +35,7 @@ def test_footwear_msme_exemption():
         manufacturer_scale="msme",
         is_imported=False
     )
-    result = check_qco_applicability(msme_product, today_date=TODAY)
+    result, _, _ = check_qco_applicability(msme_product, today_date=TODAY)
 
     assert result.applies is True
     assert result.qco_id == "QCO-FOOTWEAR-2024"
@@ -48,7 +48,7 @@ def test_footwear_msme_exemption():
         manufacturer_scale="large",
         is_imported=False
     )
-    result_large = check_qco_applicability(large_product, today_date=TODAY)
+    result_large, _, _ = check_qco_applicability(large_product, today_date=TODAY)
     assert result_large.exemption_status == "none"
 
 def test_solar_pv_future_effective_date():
@@ -58,7 +58,7 @@ def test_solar_pv_future_effective_date():
         manufacturer_scale="large",
         is_imported=False
     )
-    result = check_qco_applicability(product, today_date=TODAY)
+    result, _, _ = check_qco_applicability(product, today_date=TODAY)
 
     assert result.applies is True
     assert result.qco_id == "QCO-SOLAR-2026"
@@ -73,7 +73,7 @@ def test_steel_products_resolution():
         manufacturer_scale="large",
         is_imported=False
     )
-    result = check_qco_applicability(product, today_date=TODAY)
+    result, _, _ = check_qco_applicability(product, today_date=TODAY)
 
     assert result.applies is True
     assert result.qco_id == "QCO-STEEL-2023"
@@ -90,7 +90,7 @@ def test_non_matching_category():
         manufacturer_scale="msme",
         is_imported=False
     )
-    result = check_qco_applicability(product, today_date=TODAY)
+    result, _, _ = check_qco_applicability(product, today_date=TODAY)
 
     assert result.applies is False
     assert result.qco_id == "N/A"

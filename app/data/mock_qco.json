@@ -39,7 +39,21 @@
       "clause": "Clause 3(1)",
       "title": "Toys (Quality Control) Order, 2020",
       "url": "https://bis.gov.in/qco/toys-2020"
-    }
+    },
+    "amendment_history": [
+      {
+        "version": "1.0",
+        "effective_date": "2020-02-25",
+        "change_summary": "Original notification issued by DPIIT.",
+        "source": "G.S.R. 136(E)"
+      },
+      {
+        "version": "1.1",
+        "effective_date": "2021-01-01",
+        "change_summary": "Enforcement date finalized after 10-month transition period.",
+        "source": "S.O. 4487(E)"
+      }
+    ]
   },
   {
     "qco_id": "QCO-FOOTWEAR-2024",
@@ -76,43 +90,21 @@
       "clause": "Paragraph 2",
       "title": "Footwear Quality Control Order, 2024",
       "url": "https://dpiit.gov.in/qco/footwear-2024"
-    }
-  },
-  {
-    "qco_id": "QCO-SOLAR-2026",
-    "standard_id": "IS 14286:2019",
-    "title": "Solar Photovoltaic Modules Quality Control Order, 2026",
-    "category": "Solar PV",
-    "sub_category": "PV Modules",
-    "effective_date": "2027-01-01",
-    "transition_period_days": 365,
-    "msme_exemption": true,
-    "import_exemption": false,
-    "exemption_notes": "MSME units granted 12-month extension from effective date.",
-    "required_tests": [
+    },
+    "amendment_history": [
       {
-        "name": "Thermal Cycling Test",
-        "standard_clause": "IS 14286 Clause 10.11"
+        "version": "1.0",
+        "effective_date": "2023-03-15",
+        "change_summary": "Initial draft Quality Control Order published.",
+        "source": "DPIIT Notification 2023"
       },
       {
-        "name": "Humidity Freeze Test",
-        "standard_clause": "IS 14286 Clause 10.12"
+        "version": "2.0",
+        "effective_date": "2024-08-01",
+        "change_summary": "Mandatory implementation date enforced with MSME transition period extension.",
+        "source": "S.O. 1289(E)"
       }
-    ],
-    "required_documents": [
-      "Solar Cell Quality Audit File",
-      "Encapsulant Material Test Certificate"
-    ],
-    "recommended_labs": [
-      "National Institute of Solar Energy (NISE), Gurgaon",
-      "CPRI, Bengaluru"
-    ],
-    "citation": {
-      "document_id": "QCO-SOLAR-2026",
-      "clause": "Section 4",
-      "title": "Solar Photovoltaic Modules Quality Control Order, 2026",
-      "url": "https://mnre.gov.in/qco/pv-modules-2026"
-    }
+    ]
   },
   {
     "qco_id": "QCO-STEEL-2023",
@@ -148,6 +140,58 @@
       "clause": "Schedule II",
       "title": "Stainless Steel Products Quality Control Order, 2023",
       "url": "https://steel.gov.in/qco/stainless-steel-2023"
-    }
+    },
+    "amendment_history": [
+      {
+        "version": "1.0",
+        "effective_date": "2023-09-15",
+        "change_summary": "Ministry of Steel mandatory QCO order for stainless steel grades.",
+        "source": "S.O. 3912(E)"
+      }
+    ]
+  },
+  {
+    "qco_id": "QCO-SOLAR-2026",
+    "standard_id": "IS 14286:2019",
+    "title": "Solar Photovoltaic Modules Quality Control Order, 2026",
+    "category": "Solar PV",
+    "sub_category": "PV Modules",
+    "effective_date": "2027-01-01",
+    "transition_period_days": 365,
+    "msme_exemption": true,
+    "import_exemption": false,
+    "exemption_notes": "MSME units granted 12-month extension from effective date.",
+    "required_tests": [
+      {
+        "name": "Thermal Cycling Test",
+        "standard_clause": "IS 14286 Clause 10.11"
+      },
+      {
+        "name": "Humidity Freeze Test",
+        "standard_clause": "IS 14286 Clause 10.12"
+      }
+    ],
+    "required_documents": [
+      "Solar Cell Quality Audit File",
+      "Encapsulant Material Test Certificate"
+    ],
+    "recommended_labs": [
+      "National Institute of Solar Energy (NISE), Gurgaon",
+      "CPRI, Bengaluru"
+    ],
+    "citation": {
+      "document_id": "QCO-SOLAR-2026",
+      "clause": "Section 4",
+      "title": "Solar Photovoltaic Modules Quality Control Order, 2026",
+      "url": "https://mnre.gov.in/qco/pv-modules-2026"
+    },
+    "amendment_history": [
+      {
+        "version": "1.0",
+        "effective_date": "2026-01-01",
+        "change_summary": "MNRE announcement of upcoming solar PV quality control requirements.",
+        "source": "MNRE Order 2026"
+      }
+    ]
   }
 ]
