@@ -9,7 +9,7 @@ from app.core.rate_limiter import rate_limiter
 logger = logging.getLogger("bis_backend")
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] [req_id=%(request_id)s] %(message)s"
+    format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
 # Custom Filter to inject request_id into log records
@@ -36,7 +36,7 @@ class RequestTracingAndAuthMiddleware(BaseHTTPMiddleware):
 
         # Bypass auth & rate-limit for health and OpenAPI docs
         path = request.url.path
-        is_public = path in ["/health", "/docs", "/openapi.json", "/redoc"]
+        is_public = path in ["/health", "/api/health", "/api/ready", "/docs", "/openapi.json", "/redoc"]
 
         try:
             # 2. API Key Auth (Step 10)
@@ -49,9 +49,15 @@ class RequestTracingAndAuthMiddleware(BaseHTTPMiddleware):
                         message="Invalid or missing X-API-Key header."
                     )
 
-            # 3. Rate Limiting (Step 4)
-            if not is_public and path in ["/compliance/check", "/translate/text", "/voice/stream"]:
-                client_ip = request.client.host if request.client else "unknown"
+            # 3. Redis Rate Limiting
+            protected_prefixes = [
+                "/api/chat", "/api/rag/query", "/api/documents/upload",
+                "/api/documents/scan", "/api/ocr/process", "/api/translation/translate",
+                "/api/compliance/analyze", "/api/flashcards/generate",
+                "/compliance/check", "/translate/text", "/voice/stream"
+            ]
+            if not is_public and any(path.startswith(prefix) for prefix in protected_prefixes):
+                client_ip = request.headers.get("REMOTE_ADDR") or (request.client.host if request.client else "unknown")
                 rate_limit_key = f"{request.headers.get('X-API-Key', client_ip)}:{path}"
                 rate_limiter.check_rate_limit(rate_limit_key)
 
